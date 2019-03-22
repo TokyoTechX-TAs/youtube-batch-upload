@@ -137,7 +137,7 @@ def upload_video(videos):
 		if video['title'] != "":
 			upload_command_template = upload_command_template + " --title=" + str((video['title'])) 
 		if video['description'] != "":
-			upload_command_template = upload_command_template + " --description=" +str(video['description']) 
+			upload_command_template = upload_command_template + " --description=\"" +str(video['description']) + "\""
 		if video['keyword'] != "":		
 			upload_command_template = upload_command_template + " --keywords=" +str(video['keyword']) 
 		if video['privacy_status'] != "":
