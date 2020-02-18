@@ -5,6 +5,7 @@ import os
 import xlrd
 import xlwt
 import re
+import subprocess
 from datetime import datetime
 
 
@@ -130,28 +131,39 @@ def read_xlm(task_flag):
 
 
 def upload_video(videos):
-
+	cur_path = os. getcwd()
 	for video in videos:
 		filename_template = os.path.join(video['file_dir'],video['filename'])
-		upload_command_template = 'cd video_source & python upload_video.py --file='+ filename_template  
+		#upload_command_template = 'cd video_source & python upload_video.py --file='+ filename_template  
+		#upload_command_template = 'python upload_video.py --file='+ filename_template  
+		arg_list = ['--file',filename_template]
 		if video['title'] != "":
-			upload_command_template = upload_command_template + " --title=" + str((video['title'])) 
+			arg_list += ['--title',str((video['title'])) ]
+			#upload_command_template = upload_command_template + " --title=" + str((video['title'])) 
 		if video['description'] != "":
-			upload_command_template = upload_command_template + " --description=" +str(video['description']) 
+			#upload_command_template = upload_command_template + " --description=" +str(video['description']) 
+			arg_list += ['--description',str(video['description']) ]
 		if video['keyword'] != "":		
-			upload_command_template = upload_command_template + " --keywords=" +str(video['keyword']) 
+			#upload_command_template = upload_command_template + " --keywords=" +str(video['keyword']) 
+			arg_list += ['--keywords',str(video['keyword'])]
 		if video['privacy_status'] != "":
-			upload_command_template = upload_command_template + " --privacyStatus=" +str(video['privacy_status'])
+			#upload_command_template = upload_command_template + " --privacyStatus=" +str(video['privacy_status'])
+			arg_list += ['--privacyStatus',str(video['privacy_status'])]
 		#print(type(video["keyword"]))
 		print("---------------------------------start uploading " + video['filename'] + "---------------------------------")
+		upload_command_template = ['python','upload_video.py'] + arg_list
 		print(upload_command_template)
-		os.system(upload_command_template)
+		os.chdir(os.path.join(cur_path,'video_source'))
+		subprocess.call(upload_command_template)
+		os.chdir(cur_path)
+		
+		#os.system(upload_command_template)
 		print('-------------------------------------------------------------------------------------------------------\n')
 
 
 
 def upload_transcript(transcripts):
-
+	cur_path = os. getcwd()
 	
 	for transcript in transcripts:
 		filename_template_old = os.path.join(transcript['file_dir'],transcript['filename'])
@@ -172,31 +184,41 @@ def upload_transcript(transcripts):
 				filename_template = os.path.join(transcript['file_dir'],bin_filename)
 
 
-		upload_command_template = 'cd video_source & python upload_caption.py --videoid='+ str(transcript['videoid']) + ' --file='+filename_template
-
+		#upload_command_template = 'cd video_source & python upload_caption.py --videoid='+ str(transcript['videoid']) + ' --file='+filename_template
+		arg_list = ['--action','upload','--videoid',str(transcript['videoid']),'--file',filename_template]
 		if transcript['name'] != "":
-			upload_command_template = upload_command_template + " --name=" + str((transcript['name'])) 
+			#upload_command_template = upload_command_template + " --name=" + str((transcript['name'])) 
+			arg_list += ['--name',str((transcript['name'])) ]
 		if transcript['lang'] != "":
-			upload_command_template = upload_command_template + " --language=" +str(transcript['lang']) 
+			#upload_command_template = upload_command_template + " --language=" +str(transcript['lang']) 
+			arg_list+=['--language', str(transcript['lang'])]
 		
-		upload_command_template = upload_command_template + ' --action=upload'
+		#upload_command_template = upload_command_template + ' --action=upload'
 		print("---------------------------------start uploading " + transcript['filename'] + "---------------------------------")
+		upload_command_template = ['python','upload_caption.py'] + arg_list
 		print(upload_command_template)
-		os.system(upload_command_template)
+		os.chdir(os.path.join(cur_path,'video_source'))
+		subprocess.call(upload_command_template)
+		os.chdir(cur_path)
+		#os.system(upload_command_template)
 		print('-------------------------------------------------------------------------------------------------------\n')
 		os.rename(newfile,script_path_old)
 
 
 
 def upload_thumbnail(thumbnails):
-
+	cur_path = os. getcwd()
 	for thumbnail in thumbnails:
 		filename_template = os.path.join(thumbnail['file_dir'],thumbnail['filename'])
-		upload_command_template = 'cd video_source & python upload_thumbnails.py --file '+ filename_template + ' --video-id=' + str(thumbnail['videoid']) 
+		upload_command_template = ['python','upload_thumbnails.py','--file',filename_template,'--video-id',str(thumbnail['videoid']) ] 
+		#'cd video_source & python upload_thumbnails.py --file '+ filename_template + ' --video-id=' + str(thumbnail['videoid']) 
+		os.chdir(os.path.join(cur_path,'video_source'))
 		print(str(thumbnail['videoid']))
 		print("---------------------------------start uploading thumbnail:  " + thumbnail['filename'] + "---------------------------------")
 		print(upload_command_template)
-		os.system(upload_command_template)
+		subprocess.call(upload_command_template)
+		#os.system(upload_command_template)
+		os.chdir(cur_path)
 		print('-------------------------------------------------------------------------------------------------------\n')
 
 
